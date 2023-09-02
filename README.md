@@ -203,3 +203,61 @@ public class ServerListenerThread extends Thread {
     - HttpConnectionWorkerThread는 하나의 클라이언트 연결을 담당하며, 해당 클라이언트에게 응답을 보내는 역할을 한다.
     - 위에서 봤듯이 하나의 스레드에서 처리한다면 클라이언트의 연결 처리가 지연될 수 있지만 HttpConnectionWorkerThread를 사용하여 클라이언트는 별도의 스레드에서 처리되므로, 응답 시간을 향상시킬 수 있다.
     - 따라서 더 많은 클라이언트의 요청을 동시에 처리할 수 있어 더 많은 클라이언트를 지원하고, 서버의 성능을 향상시킬 수 있다.
+
+## 사용자 요청 파싱
+
+### InputStream을 통해 요청 읽어보기
+
+```java
+int _byte;
+
+while ((_byte = inputStream.read()) >= -1) {
+  System.out.print((char) _byte);
+}
+```
+
+#### 결과
+
+![image](https://github.com/oneny/http-server/assets/97153666/809c5776-e554-49ee-b03c-7852ba30c822)
+
+HTTP 요청에 대한 요청을 읽어 출력된 것을 확인할 수 있다.
+
+### HTTP Request 파싱하기
+
+```java
+private void parseRequestLine(InputStreamReader reader, HttpRequest request) throws IOException {
+  StringBuffer processingDataBuffer = new StringBuffer();
+  int _byte;
+
+  boolean methodParsed = false;
+  boolean requestTargetParsed = false;
+
+  while ((_byte = reader.read()) >= -1) {
+    if (_byte == CR) {
+      _byte = reader.read();
+      if (_byte == LF) { // RequestLine의 CRLF까지 오면 종
+      LOGGER.debug("Request Line VERSION to Process : {}", processingDataBuffer.toString());
+
+       return;
+       }
+    }
+
+    if (_byte == SP) {
+      if (!methodParsed) {
+        LOGGER.debug("Request Line METHOD to Process : {}", processingDataBuffer);
+       methodParsed = true;
+      } else if (!requestTargetParsed) {
+        LOGGER.debug("Request Line Req Target to Process : {}", processingDataBuffer);
+      }
+      processingDataBuffer.delete(0, processingDataBuffer.length());
+      continue;
+    }
+
+    processingDataBuffer.append((char) _byte);
+  }
+}
+```
+
+위를 실행시키면 아래와 같은 결과가 출력되는 것을 확인할 수 있다. 이렇게 Method, Request Target, HTTP Version을 분리하여 HttpRequest의 각 필드에 할당할 수 있게 된다.
+
+![image](https://github.com/oneny/algorithm-test/assets/97153666/31b1fb2b-a937-401e-aa17-b578e0ffd93c)
