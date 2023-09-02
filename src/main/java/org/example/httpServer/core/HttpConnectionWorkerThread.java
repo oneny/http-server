@@ -36,6 +36,12 @@ public class HttpConnectionWorkerThread extends Thread {
 
       outputStream.write(response.getBytes());
 
+      try {
+        sleep(5000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+
       LOGGER.info(" * Connection Processing Finished.");
     } catch (IOException e) {
       LOGGER.error("Problem with communication", e);
