@@ -42,10 +42,4 @@ public class ServerListenerThread extends Thread {
       LOGGER.error("Problem with setting socket", e);
     }
   }
-
-  public Socket acceptSocket() throws IOException {
-    Socket socket = serverSocket.accept();
-    LOGGER.info(" * Connection accepted: " + socket.getInetAddress());
-    return socket;
-  }
 }

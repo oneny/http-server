@@ -2,6 +2,8 @@ package org.example.http;
 
 public enum HttpStatusCode {
 
+  SERVER_SUCCESS_200_OK(200, "OK"),
+
   /* --- CLIENT ERRORS */
   CLIENT_ERROR_400_BAD_REQUEST(400, "Bad Request"),
   CLIENT_ERROR_401_METHOD_NOT_ALLOWED(401, "Method Not Allowed"),

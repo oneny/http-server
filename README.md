@@ -206,6 +206,10 @@ public class ServerListenerThread extends Thread {
 
 ## 사용자 요청 파싱
 
+![image](https://github.com/oneny/algorithm-test/assets/97153666/97e314d1-9e45-4cf2-9814-371a2f9e02f2)
+
+
+
 ### InputStream을 통해 요청 읽어보기
 
 ```java

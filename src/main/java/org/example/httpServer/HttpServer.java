@@ -31,6 +31,5 @@ public class HttpServer {
       e.printStackTrace();
       // TODO handle later.
     }
-
   }
 }
