@@ -1,6 +1,6 @@
 package org.example.http;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class HttpRequest extends HttpMessage {
 
@@ -8,6 +8,8 @@ public class HttpRequest extends HttpMessage {
   private String requestTarget;
   private String originalHttpVersion; // literal from the request
   private HttpVersion bestCompatibleHttpVersion;
+  private final Map<String, String> headerMap = new HashMap<>();
+  private final List<Byte> bodyByteList = new ArrayList<>();
 
   HttpRequest() { // 같은 패키지만 접근 가능
   }

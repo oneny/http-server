@@ -1,9 +1,14 @@
 package org.example.httpServer.core;
 
+import org.example.http.HttpParser;
+import org.example.http.HttpParsingException;
+import org.example.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class HttpConnectionWorkerThread extends Thread {
@@ -23,29 +28,8 @@ public class HttpConnectionWorkerThread extends Thread {
          InputStream inputStream = socket.getInputStream();
          OutputStream outputStream = socket.getOutputStream()) {
 
-      int oneInt = -1;
-      byte oldByte = (byte) -1;
-      StringBuilder sb = new StringBuilder();
-      while (-1 != (oneInt = inputStream.read())) {
-        byte thisByte = (byte) oneInt;
-
-        if (thisByte == LF && oldByte == CR) {
-          // CRLF가 완성되었으면 직전 CRLF부터 여기까기가 한 행이다.
-          String oneLine = sb.substring(0, sb.length() - 1); // LF가 버퍼에 들어가기 전이기 때문에 -2가 아닌 -1
-          LOGGER.info(oneLine);
-          if (oneLine.length() <= 0) {
-            // 내용이 없는 행
-            // 따라서 메시지 헤더의 마지막일 경우다.
-            LOGGER.info("내용이 없는 헤더, 즉 메시지 헤더의 끝");
-            break;
-          }
-          sb.setLength(0);
-        } else {
-          sb.append((char) thisByte);
-        }
-
-        oldByte = (byte) oneInt;
-      }
+      HttpParser httpParser = new HttpParser();
+      HttpRequest httpRequest = httpParser.parseHttpRequest(inputStream);
 
       String html = "<html><head><title>Simple Java HTTP Server</title></head><body><h1>This page was served using my Simple Java HTTP Server</h1></body></html>";
 
@@ -62,7 +46,9 @@ public class HttpConnectionWorkerThread extends Thread {
 
       LOGGER.info(" * Connection Processing Finished.");
     } catch (IOException e) {
-      LOGGER.error("Problem with communication", e);
+      LOGGER.error("Problem with Communication", e);
+    } catch (HttpParsingException e) {
+      LOGGER.error("Problem with HttpParsing", e);
     }
   }
 }

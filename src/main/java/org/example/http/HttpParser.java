@@ -26,7 +26,9 @@ public class HttpParser {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
     parseHeaders(reader, request);
+
     parseBody(reader, request);
 
     return request;
@@ -38,15 +40,16 @@ public class HttpParser {
    * ex) GET /oneny HTTP/1.1
    */
   private void parseRequestLine(InputStreamReader reader, HttpRequest request) throws IOException, HttpParsingException {
-    StringBuffer processingDataBuffer = new StringBuffer();
+    StringBuilder processingDataBuffer = new StringBuilder();
     int _byte;
 
     boolean methodParsed = false;
     boolean requestTargetParsed = false;
 
-    while ((_byte = reader.read()) >= 0) {
+    while ((_byte = reader.read()) != -1) {
       if (_byte == CR) {
         _byte = reader.read();
+
         if (_byte == LF) { // RequestLine의 CRLF까지 오면 종
           LOGGER.debug("Request Line VERSION to Process : {}", processingDataBuffer);
 
@@ -60,7 +63,7 @@ public class HttpParser {
             throw new HttpParsingException(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST);
           }
 
-          return;
+          return; // Request Line이 모두 파싱되면 종료
         } else {
           throw new HttpParsingException(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST);
         }
